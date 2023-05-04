@@ -19,8 +19,7 @@ def correlation_text(job):
 
 
 if __name__ == "__main__":
-    modules = []
-    modules.append(StatepointList())
+    modules = [StatepointList()]
     modules.append(ImageViewer())
     modules.append(TextDisplay(name="Correlation", message=correlation_text))
     PlotDashboard(modules=modules).main()

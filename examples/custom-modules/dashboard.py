@@ -14,11 +14,7 @@ class AwesomeDashboard(Dashboard):
 
 if __name__ == "__main__":
     modules = []
-    modules.append(StatepointList())
-
-    # Add the custom module
-    modules.append(AwesomeModule())
-
+    modules.extend((StatepointList(), AwesomeModule()))
     # Tell the dashboard to search in this path for templates
     config = {"DASHBOARD_PATHS": "."}
 

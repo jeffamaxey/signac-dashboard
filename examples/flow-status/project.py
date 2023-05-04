@@ -11,7 +11,7 @@ class Project(FlowProject):
 
 @Project.label()
 def current_step(job):
-    return "Current step: {}".format(job.doc["step"])
+    return f'Current step: {job.doc["step"]}'
 
 
 @Project.label()

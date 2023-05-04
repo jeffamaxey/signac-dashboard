@@ -67,7 +67,7 @@ class ImageViewer(Module):
 
         def make_card(filename):
             return {
-                "name": self.name + ": " + filename,
+                "name": f"{self.name}: {filename}",
                 "content": render_template(
                     self.template,
                     modal_label=modal_label,

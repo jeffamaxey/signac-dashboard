@@ -8,13 +8,9 @@ from werkzeug.utils import cached_property, import_string
 
 def simplified_keys(project):
     sps = list(project.find_statepoints())
-    varied_keys = list()
+    varied_keys = []
     for key in sps[0]:
-        same_for_all = True  # This key has the same value for all statepoints
-        for sp in sps:
-            if sps[0][key] != sp[key]:
-                same_for_all = False
-                break
+        same_for_all = all(sps[0][key] == sp[key] for sp in sps)
         if not same_for_all:
             varied_keys.append(key)
     return varied_keys
@@ -22,11 +18,10 @@ def simplified_keys(project):
 
 def ellipsis_string(string, length=60):
     string = str(string)
-    half = int(length / 2)
     if len(string) < length:
         return string
-    else:
-        return string[:half] + "..." + string[-half:]
+    half = int(length / 2)
+    return f"{string[:half]}...{string[-half:]}"
 
 
 def escape_truncated_values(data, max_chars):
@@ -56,5 +51,5 @@ class LazyView:
         return import_string(self.import_name)
 
     def __call__(self, *args, **kwargs):
-        kwargs.update({"dashboard": self.dashboard})
+        kwargs["dashboard"] = self.dashboard
         return self.view(*args, **kwargs)

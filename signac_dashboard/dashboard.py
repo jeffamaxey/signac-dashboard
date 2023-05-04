@@ -81,11 +81,7 @@ class Dashboard:
     """
 
     def __init__(self, config={}, project=None, modules=[]):
-        if project is None:
-            self.project = signac.get_project()
-        else:
-            self.project = project
-
+        self.project = signac.get_project() if project is None else project
         self.config = config
         self.modules = modules
 
@@ -132,7 +128,7 @@ class Dashboard:
         grouped = groupby(sorted(self.modules, key=keyfunc), key=keyfunc)
         modules_by_context = {}
         for context_key, context_group in grouped:
-            modules_by_context[context_key] = [m for m in context_group]
+            modules_by_context[context_key] = list(context_group)
         self._modules_by_context = modules_by_context
 
     def _create_app(self, config={}):
@@ -160,8 +156,8 @@ class Dashboard:
 
         # Set up default signac-dashboard static and template paths
         signac_dashboard_path = os.path.dirname(__file__)
-        app.static_folder = signac_dashboard_path + "/static"
-        app.template_folder = signac_dashboard_path + "/templates"
+        app.static_folder = f"{signac_dashboard_path}/static"
+        app.template_folder = f"{signac_dashboard_path}/templates"
 
         # Set up custom template paths
         # The paths in DASHBOARD_PATHS give the preferred order of template
@@ -169,7 +165,7 @@ class Dashboard:
         loader_list = []
         for dash_path in list(app.config.get("DASHBOARD_PATHS", [])):
             logger.warning(f"Adding '{dash_path}' to dashboard paths.")
-            loader_list.append(jinja2.FileSystemLoader(dash_path + "/templates"))
+            loader_list.append(jinja2.FileSystemLoader(f"{dash_path}/templates"))
 
         # The default loader goes last and is overridden by any custom paths
         loader_list.append(app.jinja_loader)
@@ -233,12 +229,11 @@ class Dashboard:
                 logger.warning(e)
                 if port:
                     port += 1
-                pass
 
     @lru_cache
     def _schema_variables(self):
         schema = self.project.detect_schema(exclude_const=True)
-        return [key for key in schema]
+        return list(schema)
 
     @lru_cache
     def _project_min_len_unique_id(self):
@@ -348,8 +343,7 @@ class Dashboard:
             return sorted(jobs, key=lambda job: self.job_sorter(job))
         except json.JSONDecodeError as error:
             flash(
-                "Failed to parse query argument. "
-                "Ensure that '{}' is valid JSON!".format(query),
+                f"Failed to parse query argument. Ensure that '{query}' is valid JSON!",
                 "warning",
             )
             raise error
@@ -390,12 +384,10 @@ class Dashboard:
         return pagination
 
     def _setup_enabled_module_indices(self):
-        enabled_module_indices = {}
-        for context_name, context_modules in self._modules_by_context.items():
-            enabled_module_indices[context_name] = [
-                i for i, m in enumerate(context_modules) if m.enabled
-            ]
-        return enabled_module_indices
+        return {
+            context_name: [i for i, m in enumerate(context_modules) if m.enabled]
+            for context_name, context_modules in self._modules_by_context.items()
+        }
 
     def _render_job_view(self, *args, **kwargs):
         g.active_page = "jobs"
@@ -488,7 +480,7 @@ class Dashboard:
             :py:meth:`flask.Flask.add_url_rule`.
         """
         if import_file is not None:
-            import_name = import_file + "." + import_name
+            import_name = f"{import_file}.{import_name}"
         view = LazyView(dashboard=self, import_name=import_name)
         for url_rule in url_rules:
             self.app.add_url_rule(

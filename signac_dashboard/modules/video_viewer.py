@@ -92,7 +92,7 @@ class VideoViewer(Module):
                     )
                 )
             return {
-                "name": self.name + ": " + filename,
+                "name": f"{self.name}: {filename}",
                 "content": render_template(
                     self.template,
                     jobid=jobid,

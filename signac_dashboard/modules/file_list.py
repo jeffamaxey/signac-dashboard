@@ -38,10 +38,7 @@ class FileList(Module):
         self.prefix_jobid = prefix_jobid
 
     def download_name(self, job, filename):
-        if self.prefix_jobid:
-            return f"{str(job)}_{filename}"
-        else:
-            return filename
+        return f"{str(job)}_{filename}" if self.prefix_jobid else filename
 
     def get_cards(self, job):
         files = sorted(

@@ -35,10 +35,7 @@ class Pagination:
 
     @property
     def first_item(self):
-        if self.per_page is None:
-            return 0
-        else:
-            return max((self.page - 1) * self.per_page, 0)
+        return 0 if self.per_page is None else max((self.page - 1) * self.per_page, 0)
 
     @property
     def last_item(self):
@@ -48,16 +45,11 @@ class Pagination:
             return min(self.page * self.per_page, self.total_count)
 
     def paginate(self, items):
-        if items is None:
-            return []
-        else:
-            return items[self.first_item : self.last_item]
+        return [] if items is None else items[self.first_item : self.last_item]
 
     def item_counts(self, tag="jobs"):
         if self.total_count > 0:
-            return "{} to {} of {} {}".format(
-                self.first_item + 1, self.last_item, self.total_count, tag
-            )
+            return f"{self.first_item + 1} to {self.last_item} of {self.total_count} {tag}"
         else:
             return f"{self.total_count} {tag}"
 
